@@ -2,3 +2,9 @@ extends layout
 
 block content
   h1= title
+  if title=='Blog'
+    a(href="/login") 
+      button Login
+  else 
+    a(href="/create") 
+      button Create

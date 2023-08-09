@@ -12,7 +12,7 @@ db.on("error", console.error.bind(console, "mongo connection error"));
 
 const authorSchema = new Schema(
   {
-    username: { type: String, required: true, unique: true },
+    username: { type: String, required: true },
     password: { type: String, required: true },
   },
   { collection: "Authors" }
@@ -23,7 +23,7 @@ const postSchema = new Schema(
     title: { type: String, required: true, minlength: 1, maxlength: 50 },
     content: { type: String, required: true, minlength: 1, maxlength: 1000 },
     date: { type: Date, required: true },
-    author: { type: Schema.ObjectId, required: true, ref: "Author" },
+    author: { type: Schema.ObjectId, required: true, ref: "Authors" },
   },
   { collection: "Posts" }
 );
