@@ -3,7 +3,7 @@ const { Strategy, ExtractJwt } = require("passport-jwt");
 const { Author } = require("./db");
 require("dotenv").config();
 const opts = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: req => req.cookies.jwt,
   secretOrKey: process.env.secretKey,
 };
 passport.use(

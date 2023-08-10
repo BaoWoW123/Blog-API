@@ -1,10 +1,11 @@
 var express = require("express");
 var router = express.Router();
 const bcrypt = require("bcryptjs");
-const { Author } = require("../db");
+const { Author, Post } = require("../db");
 const passport = require("../passport");
-const jwt = require('jsonwebtoken')
-require('dotenv').config();
+const jwt = require("jsonwebtoken");
+const { check } = require("express-validator");
+require("dotenv").config();
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -30,33 +31,56 @@ router.post("/signup", function (req, res, next) {
 });
 
 router.get("/login", async (req, res, next) => {
-  res.render("login", { title: 'Log in'});
+  res.render("login", { title: "Log in" });
 });
 
 router.post("/login", async function (req, res, next) {
-  const author = await Author.findOne({ username: req.body.username })
+  const author = await Author.findOne({ username: req.body.username });
   if (!author) return res.send("No author");
   const pw = author.password;
   try {
     bcrypt.compare(req.body.password, pw, async (err, isMatch) => {
       if (err) return next(err);
       if (isMatch) {
-        const token = jwt.sign({user:author._id}, process.env.secretKey)
-        res.json({token})
-      } else res.send('Wrong password')
+        const token = jwt.sign({ user: author._id }, process.env.secretKey);
+        res.cookie("jwt", token, { httpOnly: true, secure: true });
+        res.render("index", { title: `Welcome ${author.username}` });
+      } else res.send("Wrong password");
     });
   } catch (err) {
-    res.send('Error comparing passwords')
+    res.send("Error comparing passwords");
   }
 });
 
-router.get('/create', passport.authenticate('jwt', {session:false}),(req, res, next) => {
-  res.json({msg:'Accessed authorized route'})
-});
-//route used to check bearer token
-router.get('/creates', (req,res)=> {
-  res.json({msg: req.headers.authorization})
-})
+router.get(
+  "/create",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    console.log("AUTH", req.user);
+    res.render("create");
+  }
+);
 
+router.post(
+  "/create",
+  passport.authenticate("jwt", { session: false }),
+  [check("title").trim().escape(), check("content").trim().escape()],
+
+  async (req, res) => {
+    const post = new Post({
+      title: req.body.title,
+      content: req.body.content,
+      date: new Date(),
+      author: req.user._id, //save author as object id for reference
+    });
+    await post.save();
+    res.render("index", { title: `Welcome ${req.user.username}` });
+  }
+);
+
+//route used to check bearer token
+router.get("/creates", (req, res) => {
+  res.json({ msg: req.headers.authorization });
+});
 
 module.exports = router;

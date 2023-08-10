@@ -1,4 +1,15 @@
 extends layout
 
 block content
-  h1 Create Blog Post
+  .create
+    h1 Create Blog Post
+    form(action="" method="post") 
+        label(for="title") Title 
+          input(type="text" name='title' required minlength='1',maxlength='50')
+        label(for="content") Content
+          textArea(name='content' required minlength='5',maxlength='500')
+        button(type="submit") Post 
+    if errors
+      ul   
+        each err in errors 
+          li=err.msg
