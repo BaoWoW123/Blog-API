@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 const bcrypt = require("bcryptjs");
 const { Author } = require("../db");
-const passport = require("passport");
+const passport = require("../passport");
 const jwt = require('jsonwebtoken')
 require('dotenv').config();
 
@@ -12,12 +12,12 @@ router.get("/", function (req, res, next) {
 });
 
 router.get("/signup", (req, res, next) => {
-    //res.sendStatus(403);
-  res.render('signup', {title:'Sign up'})
+  res.sendStatus(403);
+  //res.render('signup', {title:'Sign up'})
 });
 
 router.post("/signup", function (req, res, next) {
-  //res.sendStatus(403);
+  return res.sendStatus(403);
   bcrypt.hash(req.body.password, 10, async (err, hashedPw) => {
     if (err) return next(err);
     const author = new Author({
@@ -30,7 +30,6 @@ router.post("/signup", function (req, res, next) {
 });
 
 router.get("/login", async (req, res, next) => {
-  const author = await Author.findOne({ username: 'test' })
   res.render("login", { title: 'Log in'});
 });
 
@@ -51,10 +50,9 @@ router.post("/login", async function (req, res, next) {
   }
 });
 
-router.get('/create', passport.authenticate('jwt', {session:false}), (req,res)=> {
-  res.json({msg: 'Accessed authorized route'})
-})
-
+router.get('/create', passport.authenticate('jwt', {session:false}),(req, res, next) => {
+  res.json({msg:'Accessed authorized route'})
+});
 //route used to check bearer token
 router.get('/creates', (req,res)=> {
   res.json({msg: req.headers.authorization})
