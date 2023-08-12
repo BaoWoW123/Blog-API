@@ -56,7 +56,6 @@ router.get(
   "/create",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    console.log("AUTH", req.user);
     res.render("create");
   }
 );
@@ -78,6 +77,10 @@ router.post(
   }
 );
 
+router.get('/posts', async (req, res, next) => {
+  const posts = await Post.find().exec()
+  res.json({posts:posts})
+})
 //route used to check bearer token
 router.get("/creates", (req, res) => {
   res.json({ msg: req.headers.authorization });
