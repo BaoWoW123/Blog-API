@@ -23,7 +23,7 @@ const postSchema = new Schema(
     title: { type: String, required: true, minlength: 1, maxlength: 50 },
     content: { type: String, required: true, minlength: 1, maxlength: 1000 },
     date: { type: Date, required: true },
-    author: { type: Schema.ObjectId, required: true, ref: "Authors" },
+    author: { type: String, required: true, minlength: 1, maxlength: 50},
   },
   { collection: "Posts" }
 );

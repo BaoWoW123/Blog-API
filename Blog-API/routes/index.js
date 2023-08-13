@@ -5,6 +5,7 @@ const { Author, Post } = require("../db");
 const passport = require("../passport");
 const jwt = require("jsonwebtoken");
 const { check } = require("express-validator");
+const cors = require('cors')
 require("dotenv").config();
 
 /* GET home page. */
@@ -70,14 +71,14 @@ router.post(
       title: req.body.title,
       content: req.body.content,
       date: new Date(),
-      author: req.user._id, //save author as object id for reference
+      author: req.user.username,
     });
     await post.save();
     res.render("index", { title: `Welcome ${req.user.username}` });
   }
 );
 
-router.get('/posts', async (req, res, next) => {
+router.get('/posts', cors(), async (req, res, next) => {
   const posts = await Post.find().exec()
   res.json({posts:posts})
 })
